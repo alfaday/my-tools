@@ -1,16 +1,32 @@
-package excel;//ExcelRead
+package excel;
 
 import java.io.File;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelRead {
 
+    public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String DB_URL = "jdbc:mysql://localhost:3306/test";
+
+    static final String USER = "root";
+    static final String PASS = "root";
 
     public static void main(String[] args)throws Exception {
+        String path = "d:\\内推需求-.xlsx";
+        excelToDb(path);
+    }
+
+    public static void excelToDb(String filePath) throws Exception{
+
         //1.构造方法
-        Workbook wb = new XSSFWorkbook(new File("d:\\内推需求-.xlsx"));
+        Workbook wb = new XSSFWorkbook(new File(filePath));
         //2.获得sheet，  sheet脚标从0开始
         Sheet sheet = wb.getSheetAt(5);
         //3.获得范围
@@ -42,9 +58,57 @@ public class ExcelRead {
             }
         }
         wb.close();
-    }
-
-    public void excelToDb(String filePath,String dbIp,String dbName){
 
     }
+
+    private Connection getConnection(){
+        Connection connection = null;
+        Statement stmt = null;
+        try{
+            // 注册 JDBC 驱动
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL,USER,PASS);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
+    private void executeSql(Connection connection ,String sql){
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            // 展开结果集数据库
+            while(rs.next()){
+                // 通过字段检索
+                int id  = rs.getInt("id");
+                System.out.println("id=" + id);
+//                String name = rs.getString("name");
+//                String url = rs.getString("url");
+//
+//                // 输出数据
+//                System.out.print("ID: " + id);
+//                System.out.print(", 站点名称: " + name);
+//                System.out.print(", 站点 URL: " + url);
+//                System.out.print("\n");
+            }
+            rs.close();
+            statement.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void closeConnection(Connection connection){
+        if(connection != null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
