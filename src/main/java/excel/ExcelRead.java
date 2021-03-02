@@ -24,7 +24,6 @@ public class ExcelRead {
     }
 
     public static void excelToDb(String filePath) throws Exception{
-
         //1.构造方法
         Workbook wb = new XSSFWorkbook(new File(filePath));
         //2.获得sheet，  sheet脚标从0开始
@@ -58,10 +57,9 @@ public class ExcelRead {
             }
         }
         wb.close();
-
     }
 
-    private Connection getConnection(){
+    private static Connection getConnection(){
         Connection connection = null;
         Statement stmt = null;
         try{
@@ -74,24 +72,18 @@ public class ExcelRead {
         return connection;
     }
 
-    private void executeSql(Connection connection ,String sql){
+    private static void executeSql(Connection connection ,String sql){
         try {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
+
             // 展开结果集数据库
-            while(rs.next()){
-                // 通过字段检索
-                int id  = rs.getInt("id");
-                System.out.println("id=" + id);
+//            while(rs.next()){
+//                 //通过字段检索
+//                int id  = rs.getInt("id");
+//                System.out.println("id=" + id);
 //                String name = rs.getString("name");
-//                String url = rs.getString("url");
-//
-//                // 输出数据
-//                System.out.print("ID: " + id);
-//                System.out.print(", 站点名称: " + name);
-//                System.out.print(", 站点 URL: " + url);
-//                System.out.print("\n");
-            }
+//            }
             rs.close();
             statement.close();
         }catch (Exception e){
@@ -100,7 +92,7 @@ public class ExcelRead {
 
     }
 
-    private void closeConnection(Connection connection){
+    private static void closeConnection(Connection connection){
         if(connection != null){
             try {
                 connection.close();
